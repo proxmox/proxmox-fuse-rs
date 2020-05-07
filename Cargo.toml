@@ -1,0 +1,16 @@
+[package]
+name = "proxmox-fuse"
+version = "0.1.0"
+authors = ["Wolfgang Bumiller <w.bumiller@proxmox.com>"]
+edition = "2018"
+license = "AGPL-3"
+description = "Expose fuse requests as async streams."
+
+exclude = [ "debian" ]
+
+[dependencies]
+anyhow = "1.0"
+futures = "0.3"
+libc = "0.2"
+mio = "0.6.21"
+tokio = { version = "0.2", features = ["io-driver", "macros", "signal", "stream"] }
