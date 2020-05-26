@@ -11,8 +11,8 @@ use std::{io, mem};
 
 use anyhow::{bail, format_err, Error};
 use futures::ready;
+use futures::stream::{FusedStream, Stream};
 use tokio::io::PollEvented;
-use tokio::stream::Stream;
 
 use crate::fuse_fd::FuseFd;
 use crate::requests::{self, Request, RequestGuard};
@@ -22,8 +22,12 @@ use crate::util::Stat;
 /// The default set of operations enabled when nothing else is set via the `FuseSessionBuilder`
 /// methods.
 ///
-/// By default the stream can only yield `Gettattr` requests.
+/// By default the stream can yield the following requests:
+/// * `Lookup`
+/// * `Forget`
+/// * `Getattr`
 pub const DEFAULT_OPERATIONS: sys::Operations = sys::Operations {
+    destroy: Some(FuseData::destroy),
     lookup: Some(FuseData::lookup),
     forget: Some(FuseData::forget),
     getattr: Some(FuseData::getattr),
@@ -38,6 +42,10 @@ struct FuseData {
     /// single thread at a time. The requests get pushed here, and then immediately yielded by the
     /// `Stream::poll_next()` method.
     pending_requests: RefCell<VecDeque<Request>>,
+
+    /// Set by 'destroy'.
+    finished: bool,
+
     fbuf: Arc<sys::FuseBuf>,
 }
 
@@ -45,6 +53,11 @@ unsafe impl Send for FuseData {}
 unsafe impl Sync for FuseData {}
 
 impl FuseData {
+    extern "C" fn destroy(userdata: sys::MutPtr) {
+        let fuse_data = unsafe { &mut *(userdata as *mut FuseData) };
+        fuse_data.finished = true;
+    }
+
     extern "C" fn lookup(request: sys::Request, parent: u64, file_name: sys::StrPtr) {
         let fuse_data = unsafe { &*(sys::fuse_req_userdata(request) as *mut FuseData) };
         let file_name = unsafe { CStr::from_ptr(file_name) };
@@ -438,6 +451,7 @@ impl FuseSessionBuilder {
 
         let fuse_data = Box::new(FuseData {
             pending_requests: RefCell::new(VecDeque::new()),
+            finished: false,
             fbuf: Arc::new(sys::FuseBuf::new()),
         });
         let session = unsafe {
@@ -625,6 +639,14 @@ unsafe impl Send for SessionPtr {}
 unsafe impl Sync for SessionPtr {}
 
 /// A mounted fuse file system.
+///
+/// This is a stream yielding `Request`s. The kind of requests this the stream will see depends on
+/// the settings chosen when setting up the `FuseSession` via the `FuseSessionBuilder`.
+///
+/// By default, the following are enabled:
+/// * `Lookup`
+/// * `Forget`
+/// * `Getattr`
 pub struct Fuse {
     session: SessionPtr,
     fuse_data: Box<FuseData>,
@@ -665,6 +687,10 @@ impl Stream for Fuse {
                 return Poll::Ready(Some(Ok(request)));
             }
 
+            if this.fuse_data.finished {
+                return Poll::Ready(None);
+            }
+
             ready!(this.fuse_fd.poll_read_ready(cx, mio::Ready::readable()))?;
 
             let buf: &mut sys::FuseBuf = match Arc::get_mut(&mut this.fuse_data.fbuf) {
@@ -685,6 +711,9 @@ impl Stream for Fuse {
                 }
             } else if rc < 0 {
                 return Poll::Ready(Some(Err(io::Error::from_raw_os_error(-rc))));
+            } else if rc == 0 {
+                this.fuse_data.finished = true;
+                return Poll::Ready(None);
             }
 
             unsafe {
@@ -692,5 +721,11 @@ impl Stream for Fuse {
             }
             // and try again:
         }
+    }
+}
+
+impl FusedStream for Fuse {
+    fn is_terminated(&self) -> bool {
+        self.fuse_data.finished
     }
 }
