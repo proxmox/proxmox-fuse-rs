@@ -6,7 +6,7 @@ edition = "2018"
 license = "AGPL-3"
 description = "Expose fuse requests as async streams."
 
-exclude = [ "debian" ]
+exclude = [ "build", "debian" ]
 
 [dependencies]
 anyhow = "1.0"
