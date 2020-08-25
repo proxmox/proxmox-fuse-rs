@@ -1,0 +1,47 @@
+Source: rust-proxmox-fuse
+Section: rust
+Priority: optional
+Build-Depends: debhelper (>= 11),
+ dh-cargo (>= 18),
+ cargo:native <!nocheck>,
+ rustc:native <!nocheck>,
+ libstd-rust-dev <!nocheck>,
+ librust-anyhow-1+default-dev <!nocheck>,
+ librust-futures-0.3+default-dev <!nocheck>,
+ librust-libc-0.2+default-dev <!nocheck>,
+ librust-mio-0.6+default-dev (>= 0.6.21-~~) <!nocheck>,
+ librust-tokio-0.2+default-dev <!nocheck>,
+ librust-tokio-0.2+io-driver-dev <!nocheck>,
+ librust-tokio-0.2+macros-dev <!nocheck>,
+ librust-tokio-0.2+signal-dev <!nocheck>,
+ librust-tokio-0.2+stream-dev <!nocheck>
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Standards-Version: 4.4.1
+Vcs-Git: 
+Vcs-Browser: 
+
+Package: librust-proxmox-fuse-dev
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ librust-anyhow-1+default-dev,
+ librust-futures-0.3+default-dev,
+ librust-libc-0.2+default-dev,
+ librust-mio-0.6+default-dev (>= 0.6.21-~~),
+ librust-tokio-0.2+default-dev,
+ librust-tokio-0.2+io-driver-dev,
+ librust-tokio-0.2+macros-dev,
+ librust-tokio-0.2+signal-dev,
+ librust-tokio-0.2+stream-dev
+Provides:
+ librust-proxmox-fuse+default-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0+default-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1+default-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1.0-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1.0+default-dev (= ${binary:Version})
+Description: Expose fuse requests as async streams - Rust source code
+ This package contains the source for the Rust proxmox-fuse crate, packaged by
+ debcargo for use with cargo and dh-cargo.
