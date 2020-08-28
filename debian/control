@@ -14,7 +14,8 @@ Build-Depends: debhelper (>= 11),
  librust-tokio-0.2+io-driver-dev <!nocheck>,
  librust-tokio-0.2+macros-dev <!nocheck>,
  librust-tokio-0.2+signal-dev <!nocheck>,
- librust-tokio-0.2+stream-dev <!nocheck>
+ librust-tokio-0.2+stream-dev <!nocheck>,
+ libfuse3-dev <!nocheck>
 Maintainer: Proxmox Support Team <support@proxmox.com>
 Standards-Version: 4.4.1
 Vcs-Git: 
@@ -33,7 +34,8 @@ Depends:
  librust-tokio-0.2+io-driver-dev,
  librust-tokio-0.2+macros-dev,
  librust-tokio-0.2+signal-dev,
- librust-tokio-0.2+stream-dev
+ librust-tokio-0.2+stream-dev,
+ libfuse3-dev
 Provides:
  librust-proxmox-fuse+default-dev (= ${binary:Version}),
  librust-proxmox-fuse-0-dev (= ${binary:Version}),
