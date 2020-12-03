@@ -12,7 +12,7 @@ use std::{io, mem};
 use anyhow::{bail, format_err, Error};
 use futures::ready;
 use futures::stream::{FusedStream, Stream};
-use tokio::io::PollEvented;
+use tokio::io::unix::AsyncFd;
 
 use crate::fuse_fd::FuseFd;
 use crate::requests::{self, Request, RequestGuard};
@@ -610,7 +610,7 @@ impl FuseSession {
             bail!("failed to get fuse session file descriptor");
         }
 
-        let fuse_fd = PollEvented::new(FuseFd::from_raw(fd)?)?;
+        let fuse_fd = AsyncFd::new(FuseFd::from_raw(fd)?)?;
 
         // disable mount guard
         self.mounted = false;
@@ -650,7 +650,7 @@ unsafe impl Sync for SessionPtr {}
 pub struct Fuse {
     session: SessionPtr,
     fuse_data: Box<FuseData>,
-    fuse_fd: PollEvented<FuseFd>,
+    fuse_fd: AsyncFd<FuseFd>,
 }
 
 // We lose these via the raw session pointer:
@@ -691,7 +691,7 @@ impl Stream for Fuse {
                 return Poll::Ready(None);
             }
 
-            ready!(this.fuse_fd.poll_read_ready(cx, mio::Ready::readable()))?;
+            let mut ready_guard = ready!(this.fuse_fd.poll_read_ready(cx))?;
 
             let buf: &mut sys::FuseBuf = match Arc::get_mut(&mut this.fuse_data.fbuf) {
                 Some(buf) => buf,
@@ -705,10 +705,8 @@ impl Stream for Fuse {
             let rc = unsafe { sys::fuse_session_receive_buf(this.session.as_ptr(), Some(buf)) };
 
             if rc == -libc::EAGAIN {
-                match this.fuse_fd.clear_read_ready(cx, mio::Ready::readable()) {
-                    Ok(()) => continue,
-                    Err(err) => return Poll::Ready(Some(Err(err))),
-                }
+                ready_guard.clear_ready();
+                continue;
             } else if rc < 0 {
                 return Poll::Ready(Some(Err(io::Error::from_raw_os_error(-rc))));
             } else if rc == 0 {
