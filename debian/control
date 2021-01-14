@@ -12,6 +12,7 @@ Build-Depends: debhelper (>= 11),
  librust-tokio-1+default-dev <!nocheck>,
  librust-tokio-1+macros-dev <!nocheck>,
  librust-tokio-1+net-dev <!nocheck>,
+ librust-tokio-1+rt-multi-thread-dev <!nocheck>,
  librust-tokio-1+signal-dev <!nocheck>,
  librust-tokio-stream-0.1+default-dev <!nocheck>,
  libfuse3-dev <!nocheck>
@@ -31,6 +32,7 @@ Depends:
  librust-tokio-1+default-dev,
  librust-tokio-1+macros-dev,
  librust-tokio-1+net-dev,
+ librust-tokio-1+rt-multi-thread-dev,
  librust-tokio-1+signal-dev,
  librust-tokio-stream-0.1+default-dev,
  libfuse3-dev
