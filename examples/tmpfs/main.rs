@@ -55,7 +55,7 @@ fn to_entry_param(stat: &libc::stat) -> EntryParam {
     EntryParam {
         inode: stat.st_ino,
         generation: 1,
-        attr: stat.clone(),
+        attr: *stat,
         attr_timeout: std::f64::MAX,
         entry_timeout: std::f64::MAX,
     }

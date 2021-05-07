@@ -360,7 +360,7 @@ impl ReaddirPlus {
         let entry = sys::EntryParam {
             inode: stat.st_ino,
             generation,
-            attr: stat.clone(),
+            attr: *stat,
             attr_timeout,
             entry_timeout,
         };

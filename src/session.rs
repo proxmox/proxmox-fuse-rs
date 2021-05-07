@@ -251,7 +251,6 @@ impl FuseData {
                 &*file_info,
             )
         };
-        let size = usize::from(size);
         let offset = offset as u64;
         fuse_data
             .pending_requests
@@ -301,7 +300,7 @@ impl FuseData {
                 request: RequestGuard::from_raw(request),
                 inode,
                 to_set,
-                stat: Stat::from(stat.clone()),
+                stat: Stat::from(*stat),
                 fh: file_info.map(|fi| fi.fh),
             }));
     }
@@ -348,7 +347,6 @@ impl FuseData {
                 &*file_info,
             )
         };
-        let size = usize::from(size);
         let offset = offset as u64;
         fuse_data
             .pending_requests
@@ -366,7 +364,6 @@ impl FuseData {
 
     extern "C" fn listxattr(request: sys::Request, inode: u64, size: libc::size_t) {
         let fuse_data = unsafe { &*(sys::fuse_req_userdata(request) as *mut FuseData) };
-        let size = usize::from(size);
         fuse_data.pending_requests.borrow_mut().push_back({
             if size == 0 {
                 Request::ListXAttrSize(requests::ListXAttrSize {
@@ -392,7 +389,6 @@ impl FuseData {
         let fuse_data = unsafe { &*(sys::fuse_req_userdata(request) as *mut FuseData) };
         let attr_name = unsafe { CStr::from_ptr(attr_name) };
         let attr_name = OsStr::from_bytes(attr_name.to_bytes()).to_owned();
-        let size = usize::from(size);
         fuse_data.pending_requests.borrow_mut().push_back({
             if size == 0 {
                 Request::GetXAttrSize(requests::GetXAttrSize {

@@ -266,11 +266,8 @@ pub enum ReplyBufState {
 
 impl ReplyBufState {
     #[inline]
-    pub fn is_full(self) -> bool {
-        match self {
-            ReplyBufState::Full => true,
-            _ => false,
-        }
+    pub fn is_full(&self) -> bool {
+        matches!(self, &ReplyBufState::Full)
     }
 }
 
