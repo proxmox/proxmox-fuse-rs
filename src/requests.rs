@@ -792,9 +792,15 @@ impl ListXAttr {
         unsafe { self.add_bytes_without_zero(name.as_bytes()) }
     }
 
-    /// Add a raw attribute name the response list. It must not contain any zeroes.
+    /// Add a raw attribute name the response list. It must not contain any zeroes. The terminating
+    /// zero byte will be appended to the buffer.
     ///
     /// See `add` for details.
+    ///
+    /// # Safety
+    ///
+    /// Technically safe to call, but zero bytes in `name` will be treated as separators and
+    /// cause confusion.
     pub unsafe fn add_bytes_without_zero(&mut self, name: &[u8]) -> ReplyBufState {
         if !self.check_add(name.len() + 1) {
             return ReplyBufState::Full;
@@ -810,6 +816,12 @@ impl ListXAttr {
     /// Add a raw attribute name which is already zero terminated to the response list.
     ///
     /// See `add` for details.
+    ///
+    /// # Safety
+    ///
+    /// Technically safe to call, and could technically be used to add multiple entries at once,
+    /// but is not meant to be used that way. Zero bytes in the middle will be treated as entry
+    /// separators.
     pub unsafe fn add_bytes_with_zero(&mut self, name: &[u8]) -> ReplyBufState {
         if !self.check_add(name.len() + 1) {
             return ReplyBufState::Full;
