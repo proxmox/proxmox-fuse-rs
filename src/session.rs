@@ -711,7 +711,7 @@ impl Stream for Fuse {
             }
 
             unsafe {
-                sys::fuse_session_process_buf(this.session.as_ptr(), Some(&buf));
+                sys::fuse_session_process_buf(this.session.as_ptr(), Some(buf));
             }
             // and try again:
         }
