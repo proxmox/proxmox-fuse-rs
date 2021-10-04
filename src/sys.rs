@@ -176,8 +176,8 @@ impl EntryParam {
             inode,
             generation: 1,
             attr,
-            attr_timeout: std::f64::MAX,
-            entry_timeout: std::f64::MAX,
+            attr_timeout: f64::MAX,
+            entry_timeout: f64::MAX,
         }
     }
 }
