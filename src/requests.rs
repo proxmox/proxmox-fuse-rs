@@ -683,7 +683,7 @@ pub struct Write {
 
     /// We keep a reference count on the buffer we pass to `fuse_session_receive_buf` so it will
     /// not be cleared until it is used up by requests borrowing data from it, like `Write`.
-    pub(crate) buffer: Arc<sys::FuseBuf>,
+    pub(crate) _buffer: Arc<sys::FuseBuf>,
 }
 
 unsafe impl Send for Write {}

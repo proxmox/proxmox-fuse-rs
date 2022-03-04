@@ -358,7 +358,7 @@ impl FuseData {
                 data: buffer,
                 size,
                 offset,
-                buffer: Arc::clone(&fuse_data.fbuf),
+                _buffer: Arc::clone(&fuse_data.fbuf),
             }));
     }
 
