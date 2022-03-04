@@ -1,8 +1,8 @@
 Source: rust-proxmox-fuse
 Section: rust
 Priority: optional
-Build-Depends: debhelper (>= 11),
- dh-cargo (>= 18),
+Build-Depends: debhelper (>= 12),
+ dh-cargo (>= 25),
  cargo:native <!nocheck>,
  rustc:native <!nocheck>,
  libstd-rust-dev <!nocheck>,
@@ -17,9 +17,10 @@ Build-Depends: debhelper (>= 11),
  librust-tokio-stream-0.1+default-dev <!nocheck>,
  libfuse3-dev <!nocheck>
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Standards-Version: 4.4.1
+Standards-Version: 4.5.1
 Vcs-Git: 
 Vcs-Browser: 
+Rules-Requires-Root: no
 
 Package: librust-proxmox-fuse-dev
 Architecture: any
@@ -42,8 +43,8 @@ Provides:
  librust-proxmox-fuse-0+default-dev (= ${binary:Version}),
  librust-proxmox-fuse-0.1-dev (= ${binary:Version}),
  librust-proxmox-fuse-0.1+default-dev (= ${binary:Version}),
- librust-proxmox-fuse-0.1.1-dev (= ${binary:Version}),
- librust-proxmox-fuse-0.1.1+default-dev (= ${binary:Version})
+ librust-proxmox-fuse-0.1.2-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1.2+default-dev (= ${binary:Version})
 Description: Expose fuse requests as async streams - Rust source code
  This package contains the source for the Rust proxmox-fuse crate, packaged by
  debcargo for use with cargo and dh-cargo.
