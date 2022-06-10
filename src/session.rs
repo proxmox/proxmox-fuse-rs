@@ -12,7 +12,6 @@ use std::{io, mem};
 use anyhow::{bail, format_err, Error};
 use futures::ready;
 use futures::stream::{FusedStream, Stream};
-use tokio::io::unix::AsyncFd;
 
 use crate::fuse_fd::FuseFd;
 use crate::requests::{self, Request, RequestGuard};
@@ -606,7 +605,7 @@ impl FuseSession {
             bail!("failed to get fuse session file descriptor");
         }
 
-        let fuse_fd = AsyncFd::new(FuseFd::from_raw(fd)?)?;
+        let fuse_fd = FuseFd::from_raw(fd)?;
 
         // disable mount guard
         self.mounted = false;
@@ -646,7 +645,7 @@ unsafe impl Sync for SessionPtr {}
 pub struct Fuse {
     session: SessionPtr,
     fuse_data: Box<FuseData>,
-    fuse_fd: AsyncFd<FuseFd>,
+    fuse_fd: FuseFd,
 }
 
 // We lose these via the raw session pointer:
@@ -702,6 +701,10 @@ impl Stream for Fuse {
 
             if rc == -libc::EAGAIN {
                 ready_guard.clear_ready();
+                if ready_guard.is_unmounted() || ready_guard.is_eof() {
+                    this.fuse_data.finished = true;
+                    return Poll::Ready(None);
+                }
                 continue;
             } else if rc < 0 {
                 return Poll::Ready(Some(Err(io::Error::from_raw_os_error(-rc))));
