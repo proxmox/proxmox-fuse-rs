@@ -290,10 +290,10 @@ impl std::fmt::Debug for ReplyBuf {
 impl ReplyBuf {
     /// Create a new empty `ReplyBuf` of `size` with element counting index at `next`.
     pub fn new(request: Request, size: usize) -> Self {
-        let mut buffer = Vec::with_capacity(size);
-        unsafe {
-            buffer.set_len(size);
-        }
+        let buffer = unsafe {
+            let data = std::alloc::alloc(std::alloc::Layout::array::<u8>(size).unwrap());
+            Vec::from_raw_parts(data as *mut u8, size, size)
+        };
         Self {
             buffer,
             filled: 0,
