@@ -43,8 +43,8 @@ Provides:
  librust-proxmox-fuse-0+default-dev (= ${binary:Version}),
  librust-proxmox-fuse-0.1-dev (= ${binary:Version}),
  librust-proxmox-fuse-0.1+default-dev (= ${binary:Version}),
- librust-proxmox-fuse-0.1.3-dev (= ${binary:Version}),
- librust-proxmox-fuse-0.1.3+default-dev (= ${binary:Version})
+ librust-proxmox-fuse-0.1.4-dev (= ${binary:Version}),
+ librust-proxmox-fuse-0.1.4+default-dev (= ${binary:Version})
 Description: Expose fuse requests as async streams - Rust source code
  This package contains the source for the Rust proxmox-fuse crate, packaged by
  debcargo for use with cargo and dh-cargo.

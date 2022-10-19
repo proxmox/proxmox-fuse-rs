@@ -1,3 +1,11 @@
+rust-proxmox-fuse (0.1.4-1) pve; urgency=medium
+
+  * impl AsFd for FuseFd
+
+  * bump edition to 2021
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 19 Oct 2022 14:39:01 +0200
+
 rust-proxmox-fuse (0.1.3-1) pve; urgency=medium
 
   * use a custom reactor for the fuse file descriptor
