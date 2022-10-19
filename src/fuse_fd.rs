@@ -1,7 +1,7 @@
 //! This binds the fuse file descriptor to the tokio reactor.
 
 use std::io;
-use std::os::unix::io::{AsRawFd, RawFd};
+use std::os::unix::io::{AsFd, AsRawFd, BorrowedFd, RawFd};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
@@ -104,6 +104,12 @@ impl FuseFd {
 
         *state_waker = Some(cx.waker().clone());
         Poll::Pending
+    }
+}
+
+impl AsFd for FuseFd {
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw(self.fd) }
     }
 }
 
