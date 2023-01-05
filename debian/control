@@ -17,9 +17,10 @@ Build-Depends: debhelper (>= 12),
  librust-tokio-stream-0.1+default-dev <!nocheck>,
  libfuse3-dev <!nocheck>
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Standards-Version: 4.5.1
+Standards-Version: 4.6.1
 Vcs-Git: 
 Vcs-Browser: 
+X-Cargo-Crate: proxmox-fuse
 Rules-Requires-Root: no
 
 Package: librust-proxmox-fuse-dev
