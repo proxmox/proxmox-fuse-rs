@@ -71,7 +71,7 @@ extern "C" {
     pub fn fuse_reply_buf(req: Request, buf: *const c_char, size: size_t) -> c_int;
     pub fn fuse_reply_entry(req: Request, entry: Option<&EntryParam>) -> c_int;
     pub fn fuse_reply_create(req: Request, entry: Option<&EntryParam>, file_info: *const FuseFileInfo) -> c_int;
-    pub fn fuse_reply_open(req: Request, entry: Option<&EntryParam>, file_info: *const FuseFileInfo) -> c_int;
+    pub fn fuse_reply_open(req: Request, file_info: *const FuseFileInfo) -> c_int;
     pub fn fuse_reply_xattr(req: Request, size: size_t) -> c_int;
     pub fn fuse_reply_readlink(req: Request, link: StrPtr) -> c_int;
     pub fn fuse_reply_none(req: Request);

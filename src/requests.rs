@@ -469,9 +469,9 @@ impl FuseRequest for Open {
 
 impl Open {
     /// The `fh` provided here will be available in later requests for this file handle.
-    pub fn reply(mut self, entry: &sys::EntryParam, fh: u64) -> io::Result<()> {
+    pub fn reply(mut self, fh: u64) -> io::Result<()> {
         self.file_info.fh = fh;
-        reply_result!(self: sys::fuse_reply_open(self.request.raw, Some(entry), &self.file_info))
+        reply_result!(self: sys::fuse_reply_open(self.request.raw, &self.file_info))
     }
 }
 
