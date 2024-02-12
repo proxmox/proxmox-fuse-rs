@@ -6,6 +6,7 @@
 
 use std::ffi::{CStr, CString, OsStr, OsString};
 use std::io;
+use std::io::IoSlice;
 use std::os::unix::ffi::OsStrExt;
 use std::sync::Arc;
 use std::time::Duration;
@@ -515,6 +516,10 @@ impl Read {
     pub fn reply(self, data: &[u8]) -> io::Result<()> {
         let ptr = data.as_ptr() as *const libc::c_char;
         reply_result!(self: sys::fuse_reply_buf(self.request.raw, ptr, data.len()))
+    }
+
+    pub fn reply_vectored(self, data: &[IoSlice<'_>]) -> io::Result<()> {
+        reply_result!(self: sys::fuse_reply_iov(self.request.raw, data.as_ptr(), data.len() as _))
     }
 }
 
