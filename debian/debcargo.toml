@@ -1,6 +1,7 @@
 overlay = "."
 crate_src_path = ".."
 maintainer = "Proxmox Support Team <support@proxmox.com>"
+whitelist = [ "src/glue.c" ]
 
 [source]
 # TODO: update once public
