@@ -69,6 +69,7 @@ extern "C" {
     pub fn fuse_reply_attr(req: Request, attr: Option<&libc::stat>, timeout: f64) -> c_int;
     pub fn fuse_reply_err(req: Request, errno: c_int) -> c_int;
     pub fn fuse_reply_buf(req: Request, buf: *const c_char, size: size_t) -> c_int;
+    pub fn fuse_reply_iov(req: Request, iov: *const std::io::IoSlice<'_>, count: c_int) -> c_int;
     pub fn fuse_reply_entry(req: Request, entry: Option<&EntryParam>) -> c_int;
     pub fn fuse_reply_create(req: Request, entry: Option<&EntryParam>, file_info: *const FuseFileInfo) -> c_int;
     pub fn fuse_reply_open(req: Request, file_info: *const FuseFileInfo) -> c_int;
@@ -225,21 +226,66 @@ impl FuseBuf {
 #[repr(C)]
 pub struct FuseFileInfo {
     /// Open flags. Available in open() and release()
-    pub flags: c_int,
+    pub(crate) flags: c_int,
 
-    /// Various bitfields which we will not support for now:
+    /// Various bitfields for which we have C glue code in `glue.c`.
     _bits: u64,
 
     /// File handle.  May be filled in by filesystem in open().
     /// Available in all other file operations
-    pub fh: u64,
+    pub(crate) fh: u64,
 
     /// Lock owner id. Available in locking operations and flush.
-    pub lock_owner: u64,
+    pub(crate) lock_owner: u64,
 
     /// Requested poll events. Available in ->poll. Only set on kernels
     /// which support it.  If unsupported, this field is set to zero.
-    pub poll_events: u32,
+    pub(crate) poll_events: u32,
+}
+
+macro_rules! fuse_file_info_accessors {
+    ($(($flag:ident, $glue_set:ident, $glue_get:ident, $rust_set:ident, $rust_get:ident))+) => {
+        #[link(name = "glue", kind = "static")]
+        extern "C" {
+            $(
+            fn $glue_set(ffi: *mut FuseFileInfo, value: libc::c_uint);
+            fn $glue_get(ffi: *mut FuseFileInfo) -> libc::c_uint;
+            )+
+        }
+
+        impl FuseFileInfo {
+            $(
+            #[doc = concat!(
+                "Set the '",
+                stringify!($flag),
+                "' flag. See fuse's `struct fuse_file_info` for details."
+            )]
+            pub fn $rust_set(&mut self, value: bool) {
+                unsafe { $glue_set(self, value as _) }
+            }
+
+            #[doc = concat!(
+                "Get the '",
+                stringify!($flag),
+                "' flag. See fuse's `struct fuse_file_info` for details."
+            )]
+            pub fn $rust_get(&mut self) -> bool {
+                unsafe { $glue_get(self) != 0 }
+            }
+            )+
+        }
+    };
+}
+
+#[rustfmt::skip]
+fuse_file_info_accessors! {
+    (writepage,     glue_set_ffi_writepage,     glue_get_ffi_writepage,     set_writepage,     get_writepage)
+    (direct_io,     glue_set_ffi_direct_io,     glue_get_ffi_direct_io,     set_direct_io,     get_direct_io)
+    (flush,         glue_set_ffi_flush,         glue_get_ffi_flush,         set_flush,         get_flush)
+    (nonseekable,   glue_set_ffi_nonseekable,   glue_get_ffi_nonseekable,   set_nonseekable,   get_nonseekable)
+    (flock_release, glue_set_ffi_flock_release, glue_get_ffi_flock_release, set_flock_release, get_flock_release)
+    (cache_readdir, glue_set_ffi_cache_readdir, glue_get_ffi_cache_readdir, set_cache_readdir, get_cache_readdir)
+    (noflush,       glue_set_ffi_noflush,       glue_get_ffi_noflush,       set_noflush,       get_noflush)
 }
 
 #[rustfmt::skip]

@@ -409,7 +409,7 @@ pub struct Create {
     pub parent: u64,
     pub file_name: OsString,
     pub mode: libc::mode_t,
-    pub(crate) file_info: sys::FuseFileInfo,
+    pub file_info: sys::FuseFileInfo,
 }
 
 impl FuseRequest for Create {
@@ -458,7 +458,7 @@ pub struct Open {
     pub(crate) request: RequestGuard,
     pub inode: u64,
     pub flags: libc::c_int,
-    pub(crate) file_info: sys::FuseFileInfo,
+    pub file_info: sys::FuseFileInfo,
 }
 
 impl FuseRequest for Open {
