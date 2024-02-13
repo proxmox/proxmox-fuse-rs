@@ -1,3 +1,12 @@
+include /usr/share/dpkg/pkg-info.mk
+
+SRCPACKAGE=rust-proxmox-fuse
+PACKAGE=lib$(SRCPACKAGE)-dev
+ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
+DEB=$(PACKAGE)_$(DEB_VERSION)_$(ARCH).deb
+DSC=$(SRCPACKAGE)_$(DEB_VERSION)_$(ARCH).deb
+
 .PHONY: all
 all: check
 
@@ -9,7 +18,6 @@ check:
 dinstall: deb
 	sudo -k dpkg -i build/librust-*.deb
 
-.PHONY: build
 build:
 	rm -rf build
 	rm debian/control
@@ -27,18 +35,31 @@ build:
 	cp build/proxmox-fuse/debian/control debian/control
 
 .PHONY: deb
-deb: build
+deb:
+	rm -rf build
+	$(MAKE) build/$(DEB)
+build/$(DEB): build
 	(cd build/proxmox-fuse && CARGO=/usr/bin/cargo RUSTC=/usr/bin/rustc dpkg-buildpackage -b -uc -us)
 	lintian build/*.deb
 
+.PHONY: dsc
+dsc:
+	rm -rf build
+	$(MAKE) build/$(DSC)
+build/$(DSC): build
+	(cd build/proxmox-fuse && CARGO=/usr/bin/cargo RUSTC=/usr/bin/rustc dpkg-buildpackage -S -uc -us)
+	lintian build/*.dsc
+
 .PHONY: clean
 clean:
-	rm -rf build *.deb *.buildinfo *.changes *.orig.tar.gz
+	rm -rf build
 	cargo clean
 
-upload: deb
+.PHONY: upload
+upload: UPLOAD_DIST ?= $(DEB_DISTRIBUTION)
+upload: build/$(DEB)
 	cd build; \
 	    dcmd --deb rust-proxmox-fuse_*.changes \
 	    | grep -v '.changes$$' \
 	    | tar -cf- -T- \
-	    | ssh -X repoman@repo.proxmox.com upload --product devel --dist bullseye
+	    | ssh -X repoman@repo.proxmox.com upload --product devel --dist $(UPLOAD_DIST)
