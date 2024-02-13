@@ -208,6 +208,9 @@ pub struct FuseBuf {
     pos: off_t,
 }
 
+unsafe impl Send for FuseBuf {}
+unsafe impl Sync for FuseBuf {}
+
 impl Drop for FuseBuf {
     fn drop(&mut self) {
         unsafe {
