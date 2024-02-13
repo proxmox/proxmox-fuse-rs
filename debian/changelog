@@ -1,3 +1,17 @@
+rust-proxmox-fuse (0.1.5-1) bookworm; urgency=medium
+
+  * add `Read::reply_vectored` taking an IoSlice
+
+  * fix `Open::reply` - previously this passed garbage to the fuse library and
+    therefore is not considered an API break, since it never worked
+
+  * expose FileInfo from the Open request and provide accessors to the most
+    bits like direct_io, keep_cache etc.
+
+  * minor doc improvements
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 13 Feb 2024 13:48:40 +0100
+
 rust-proxmox-fuse (0.1.4-1) pve; urgency=medium
 
   * impl AsFd for FuseFd
