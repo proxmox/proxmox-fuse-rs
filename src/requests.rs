@@ -14,6 +14,9 @@ use std::time::Duration;
 use crate::sys::{self, ReplyBufState};
 use crate::util::Stat;
 
+// expose this here for documentation purposes
+pub use crate::sys::FuseFileInfo;
+
 #[derive(Debug)]
 pub struct RequestGuard {
     raw: sys::Request,
@@ -409,7 +412,7 @@ pub struct Create {
     pub parent: u64,
     pub file_name: OsString,
     pub mode: libc::mode_t,
-    pub file_info: sys::FuseFileInfo,
+    pub file_info: FuseFileInfo,
 }
 
 impl FuseRequest for Create {
@@ -458,7 +461,9 @@ pub struct Open {
     pub(crate) request: RequestGuard,
     pub inode: u64,
     pub flags: libc::c_int,
-    pub file_info: sys::FuseFileInfo,
+
+    /// This can be used to set flags like `direct_io` or `writecache`...
+    pub file_info: FuseFileInfo,
 }
 
 impl FuseRequest for Open {

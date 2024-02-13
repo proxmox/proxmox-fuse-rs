@@ -222,6 +222,8 @@ impl FuseBuf {
     }
 }
 
+/// This is used to communicate the result of an `Open` request.
+/// This contains some C bitfields for which accessor methods are provided.
 #[derive(Clone, Debug)]
 #[repr(C)]
 pub struct FuseFileInfo {
@@ -256,18 +258,18 @@ macro_rules! fuse_file_info_accessors {
         impl FuseFileInfo {
             $(
             #[doc = concat!(
-                "Set the '",
+                "Set the `",
                 stringify!($flag),
-                "' flag. See fuse's `struct fuse_file_info` for details."
+                "` flag. See fuse's `struct fuse_file_info` for details."
             )]
             pub fn $rust_set(&mut self, value: bool) {
                 unsafe { $glue_set(self, value as _) }
             }
 
             #[doc = concat!(
-                "Get the '",
+                "Get the `",
                 stringify!($flag),
-                "' flag. See fuse's `struct fuse_file_info` for details."
+                "` flag. See fuse's `struct fuse_file_info` for details."
             )]
             pub fn $rust_get(&mut self) -> bool {
                 unsafe { $glue_get(self) != 0 }
