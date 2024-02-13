@@ -343,7 +343,7 @@ impl ReplyBuf {
     pub fn new(request: Request, size: usize) -> Self {
         let buffer = unsafe {
             let data = std::alloc::alloc(std::alloc::Layout::array::<u8>(size).unwrap());
-            Vec::from_raw_parts(data as *mut u8, size, size)
+            Vec::from_raw_parts(data, size, size)
         };
         Self {
             buffer,

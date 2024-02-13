@@ -578,11 +578,11 @@ impl Drop for FuseSession {
     fn drop(&mut self) {
         unsafe {
             if self.mounted {
-                let _ = sys::fuse_session_unmount(self.session);
+                sys::fuse_session_unmount(self.session);
             }
 
             if !self.session.is_null() {
-                let _ = sys::fuse_session_destroy(self.session);
+                sys::fuse_session_destroy(self.session);
             }
         }
     }
@@ -654,8 +654,8 @@ impl Unpin for Fuse {}
 impl Drop for Fuse {
     fn drop(&mut self) {
         unsafe {
-            let _ = sys::fuse_session_unmount(self.session.as_ptr());
-            let _ = sys::fuse_session_destroy(self.session.as_ptr());
+            sys::fuse_session_unmount(self.session.as_ptr());
+            sys::fuse_session_destroy(self.session.as_ptr());
         }
     }
 }
