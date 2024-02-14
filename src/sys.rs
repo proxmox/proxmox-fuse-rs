@@ -4,7 +4,7 @@ use std::ffi::CStr;
 use std::io;
 use std::marker::PhantomData;
 
-use libc::{c_char, c_int, c_void, off_t, size_t};
+use libc::{c_char, c_int, c_uint, c_void, off_t, size_t};
 
 /// Node ID of the root i-node. This is fixed according to the FUSE API.
 pub const ROOT_ID: u64 = 1;
@@ -234,7 +234,8 @@ pub struct FuseFileInfo {
     pub(crate) flags: c_int,
 
     /// Various bitfields for which we have C glue code in `glue.c`.
-    _bits: u64,
+    _bits: c_uint,
+    _bits2: c_uint,
 
     /// File handle.  May be filled in by filesystem in open().
     /// Available in all other file operations
