@@ -202,12 +202,8 @@ impl FuseData {
     }
 
     extern "C" fn open(request: sys::Request, inode: u64, file_info: *const sys::FuseFileInfo) {
-        let (fuse_data, file_info) = unsafe {
-            (
-                &*(sys::fuse_req_userdata(request) as *mut FuseData),
-                &*file_info,
-            )
-        };
+        let fuse_data = unsafe { &*(sys::fuse_req_userdata(request) as *mut FuseData) };
+        let file_info = unsafe { std::ptr::read(file_info) };
         fuse_data
             .pending_requests
             .borrow_mut()
@@ -215,7 +211,7 @@ impl FuseData {
                 request: RequestGuard::from_raw(request),
                 inode,
                 flags: file_info.flags,
-                file_info: file_info.clone(),
+                file_info,
             }));
     }
 
