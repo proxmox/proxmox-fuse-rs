@@ -1,3 +1,11 @@
+rust-proxmox-fuse (0.1.6-1) bookworm; urgency=medium
+
+  * fix alignment issue in FuseFileInfo's bitfields
+
+  * cleanup code for Open requests
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 14 Feb 2024 12:45:50 +0100
+
 rust-proxmox-fuse (0.1.5-1) bookworm; urgency=medium
 
   * add `Read::reply_vectored` taking an IoSlice
