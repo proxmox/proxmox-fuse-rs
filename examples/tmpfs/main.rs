@@ -151,7 +151,7 @@ async fn handle_fuse(mut fuse: Fuse) -> Result<(), Error> {
                 }
             }
             Request::Open(request) => match fs.lookup(request.inode) {
-                Ok(node) => request.reply(&to_entry_param(&node.leak().stat.read().unwrap()), 0)?,
+                Ok(node) => request.reply(0)?,
                 Err(err) => handle_io_err(err, |err| request.io_fail(err))?,
             },
             Request::Release(request) => match fs.forget(request.inode, 1) {
