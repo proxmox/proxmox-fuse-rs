@@ -1,6 +1,6 @@
 [package]
 name = "proxmox-fuse"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Wolfgang Bumiller <w.bumiller@proxmox.com>"]
 edition = "2021"
 license = "AGPL-3"

@@ -1,3 +1,9 @@
+rust-proxmox-fuse (0.1.7-1) bookworm; urgency=medium
+
+  * block and ignore signals in reactor thread
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 21 Mar 2024 12:32:48 +0100
+
 rust-proxmox-fuse (0.1.6-1) bookworm; urgency=medium
 
   * fix alignment issue in FuseFileInfo's bitfields
