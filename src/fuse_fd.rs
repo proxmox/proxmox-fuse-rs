@@ -275,11 +275,17 @@ impl Epoll {
 
     /// `epoll_wait` wrapper.
     fn wait(&self, events: &mut [libc::epoll_event]) -> io::Result<usize> {
-        let rc = unsafe { libc::epoll_wait(self.epfd, &mut events[0], events.len() as i32, -1) };
-        if rc < 0 {
-            Err(io::Error::last_os_error())
-        } else {
-            Ok(rc as usize)
+        loop {
+            let rc =
+                unsafe { libc::epoll_wait(self.epfd, &mut events[0], events.len() as i32, -1) };
+            if rc < 0 {
+                let err = io::Error::last_os_error();
+                if err.kind() == io::ErrorKind::Interrupted {
+                    continue;
+                }
+                return Err(io::Error::last_os_error());
+            }
+            return Ok(rc as usize);
         }
     }
 }
