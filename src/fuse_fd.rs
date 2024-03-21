@@ -288,11 +288,27 @@ impl Epoll {
 ///
 /// Calls out to `poll_thread_inner` and deals with its errors.
 fn poll_thread_main(poll: Arc<Epoll>, fd: RawFd, state: Arc<PollState>) {
-    match poll_thread_inner(poll, fd, Arc::clone(&state)) {
-        Ok(()) => (),
-        Err(err) => {
-            *state.error.lock().unwrap() = Some(err);
-            state.ready.fetch_or(READY_FIN_ERR, Ordering::AcqRel);
+    let err = unsafe {
+        let mut set = std::mem::zeroed::<libc::sigset_t>();
+        libc::sigfillset(&mut set);
+        let rc = libc::pthread_sigmask(libc::SIG_BLOCK, &set, std::ptr::null_mut());
+        if rc != 0 {
+            Some(io::Error::last_os_error())
+        } else {
+            None
+        }
+    };
+
+    if err.is_some() {
+        *state.error.lock().unwrap() = err;
+        state.ready.fetch_or(READY_FIN_ERR, Ordering::AcqRel);
+    } else {
+        match poll_thread_inner(poll, fd, Arc::clone(&state)) {
+            Ok(()) => (),
+            Err(err) => {
+                *state.error.lock().unwrap() = Some(err);
+                state.ready.fetch_or(READY_FIN_ERR, Ordering::AcqRel);
+            }
         }
     }
 
