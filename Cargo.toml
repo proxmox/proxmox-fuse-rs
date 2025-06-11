@@ -2,7 +2,7 @@
 name = "proxmox-fuse"
 version = "0.1.7"
 authors = ["Wolfgang Bumiller <w.bumiller@proxmox.com>"]
-edition = "2021"
+edition = "2024"
 license = "AGPL-3"
 description = "Expose fuse requests as async streams."
 

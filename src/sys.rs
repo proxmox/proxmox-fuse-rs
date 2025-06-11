@@ -60,7 +60,7 @@ impl<'a> From<&'a [*const c_char]> for FuseArgs<'a> {
 
 #[rustfmt::skip]
 #[link(name = "fuse3")]
-extern "C" {
+unsafe extern "C" {
     pub fn fuse_session_new(args: Option<&FuseArgs>, oprs: Option<&Operations>, size: size_t, op: ConstPtr) -> MutPtr;
     pub fn fuse_session_fd(session: ConstPtr) -> c_int;
     pub fn fuse_session_mount(session: ConstPtr, mountpoint: StrPtr) -> c_int;
@@ -252,7 +252,7 @@ pub struct FuseFileInfo {
 macro_rules! fuse_file_info_accessors {
     ($(($flag:ident, $glue_set:ident, $glue_get:ident, $rust_set:ident, $rust_get:ident))+) => {
         #[link(name = "glue", kind = "static")]
-        extern "C" {
+        unsafe extern "C" {
             $(
             fn $glue_set(ffi: *mut FuseFileInfo, value: libc::c_uint);
             fn $glue_get(ffi: *mut FuseFileInfo) -> libc::c_uint;
